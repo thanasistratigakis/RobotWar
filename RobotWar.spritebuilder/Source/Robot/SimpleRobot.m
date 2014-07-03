@@ -22,13 +22,22 @@ typedef NS_ENUM(NSInteger, RobotState) {
     
     CGPoint _lastKnownPosition;
     CGFloat _lastKnownPositionTimestamp;
+    BOOL firstMovement;
+}
+
+- (void) enter
+{
+        firstMovement = TRUE;
 }
 
 - (void)run {
+
     while (true) {
+        // if robot is shooting, do all this stuff
         if (_currentRobotState == RobotStateFiring) {
-            
+            // if 1 second has elapsed
             if ((self.currentTimestamp - _lastKnownPositionTimestamp) > 1.f) {
+                // start searching
                 _currentRobotState = RobotStateSearching;
             } else {
                 CGFloat angle = [self angleBetweenGunHeadingDirectionAndWorldPosition:_lastKnownPosition];
@@ -43,13 +52,24 @@ typedef NS_ENUM(NSInteger, RobotState) {
         
         if (_currentRobotState == RobotStateSearching) {
             [self moveAhead:50];
-            [self turnRobotLeft:20];
+            [self turnRobotLeft: RAND_FROM_TO(15, 30)];
             [self moveAhead:50];
-            [self turnRobotRight:20];
+            [self turnRobotRight:RAND_FROM_TO(15, 30)];
         }
         
         if (_currentRobotState == RobotStateDefault) {
-            [self moveAhead:100];
+            
+            if (firstMovement) {
+                int decideLR = RAND_FROM_TO(1, 2);
+                if (decideLR == 1) {
+                [self turnRobotLeft: RAND_FROM_TO(15, 30)];
+                } else {
+                [self turnRobotRight:RAND_FROM_TO(15, 30)];
+                }
+                firstMovement = FALSE;
+            }
+            
+            [self moveAhead:RAND_FROM_TO(15, 30)];
         }
     }
 }
@@ -99,6 +119,17 @@ typedef NS_ENUM(NSInteger, RobotState) {
         
         _currentRobotState = previousState;
     }
+}
+
+
+- (void)_bulletHitEnemy:(Bullet*)bullet {
+    
+    if (_currentRobotState != RobotStateFiring) {
+        [self cancelActiveAction];
+    }
+    //RobotState previousState = _currentRobotState;
+    _currentRobotState = RobotStateFiring;
+    _currentRobotState = RobotStateSearching;
 }
 
 @end
