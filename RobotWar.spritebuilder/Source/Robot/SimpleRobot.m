@@ -13,6 +13,8 @@ typedef NS_ENUM(NSInteger, RobotState) {
     RobotStateTurnaround,
     RobotStateFiring,
     RobotStateSearching
+    
+    #define RAND_FROM_TO(min, max) (min + arc4random_uniform(max - min + 1))
 };
 
 @implementation SimpleRobot {
@@ -31,9 +33,9 @@ typedef NS_ENUM(NSInteger, RobotState) {
             } else {
                 CGFloat angle = [self angleBetweenGunHeadingDirectionAndWorldPosition:_lastKnownPosition];
                 if (angle >= 0) {
-                    [self turnGunRight:20];
+                    [self turnGunRight:abs(angle)];
                 } else {
-                    [self turnGunLeft:20];
+                    [self turnGunLeft:abs(angle)];
                 }
                 [self shoot];
             }
@@ -85,15 +87,15 @@ typedef NS_ENUM(NSInteger, RobotState) {
         _currentRobotState = RobotStateTurnaround;
         
         
-        // always turn to head straight away from the wall
         if (angle >= 0) {
-            [self turnRobotLeft:abs(angle)];
+            // if angle is greater than 0 then turn left
+            [self turnRobotLeft: RAND_FROM_TO(100, 180)];
         } else {
-            [self turnRobotRight:abs(angle)];
-            
+            // if angle is less than 0 then turn right
+            [self turnRobotRight: RAND_FROM_TO(100, 180)];
         }
         
-        [self moveAhead:20];
+        [self moveAhead:40];
         
         _currentRobotState = previousState;
     }

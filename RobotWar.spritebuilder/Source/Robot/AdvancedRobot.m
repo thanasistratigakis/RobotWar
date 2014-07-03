@@ -22,35 +22,35 @@ typedef NS_ENUM(NSInteger, RobotState) {
   CGFloat _lastKnownPositionTimestamp;
 }
 
-- (void)run {
-  while (true) {
-    if (_currentRobotState == RobotStateFiring) {
-      
-      if ((self.currentTimestamp - _lastKnownPositionTimestamp) > 1.f) {
-        _currentRobotState = RobotStateSearching;
-      } else {
-        CGFloat angle = [self angleBetweenGunHeadingDirectionAndWorldPosition:_lastKnownPosition];
-        if (angle >= 0) {
-          [self turnGunRight:abs(angle)];
-        } else {
-          [self turnGunLeft:abs(angle)];
-        }
-        [self shoot];
-      }
-    }
-    
-    if (_currentRobotState == RobotStateSearching) {
-      [self moveAhead:50];
-      [self turnRobotLeft:20];
-      [self moveAhead:50];
-      [self turnRobotRight:20];
-    }
-    
-    if (_currentRobotState == RobotStateDefault) {
-      [self moveAhead:100];
-    }
-  }
-}
+//- (void)run {
+//  while (true) {
+//    if (_currentRobotState == RobotStateFiring) {
+//      
+//      if ((self.currentTimestamp - _lastKnownPositionTimestamp) > 1.f) {
+//        _currentRobotState = RobotStateSearching;
+//      } else {
+//        CGFloat angle = [self angleBetweenGunHeadingDirectionAndWorldPosition:_lastKnownPosition];
+//        if (angle >= 0) {
+//          [self turnGunRight:abs(angle)];
+//        } else {
+//          [self turnGunLeft:abs(angle)];
+//        }
+//        [self shoot];
+//      }
+//    }
+//    
+//    if (_currentRobotState == RobotStateSearching) {
+//      [self moveAhead:50];
+//      [self turnRobotLeft:20];
+//      [self moveAhead:50];
+//      [self turnRobotRight:20];
+//    }
+//    
+//    if (_currentRobotState == RobotStateDefault) {
+//      [self moveAhead:100];
+//    }
+//  }
+//}
 
 - (void)bulletHitEnemy:(Bullet *)bullet {
   // There are a couple of neat things you could do in this handler
