@@ -12,7 +12,8 @@ typedef NS_ENUM(NSInteger, RobotState) {
     RobotStateDefault,
     RobotStateTurnaround,
     RobotStateFiring,
-    RobotStateSearching
+    RobotStateSearching,
+    RobotStateRunningAway
     
     #define RAND_FROM_TO(min, max) (min + arc4random_uniform(max - min + 1))
 };
@@ -23,12 +24,11 @@ typedef NS_ENUM(NSInteger, RobotState) {
     CGPoint _lastKnownPosition;
     CGFloat _lastKnownPositionTimestamp;
     BOOL firstMovement;
+    CGPoint movementOne;
+    CGPoint movementNext;
+    CGFloat movementTime;
 }
 
-- (void) enter
-{
-        firstMovement = TRUE;
-}
 
 - (void)run {
 
@@ -51,24 +51,33 @@ typedef NS_ENUM(NSInteger, RobotState) {
         }
         
         if (_currentRobotState == RobotStateSearching) {
-            [self moveAhead:50];
-            [self turnRobotLeft: RAND_FROM_TO(15, 30)];
-            [self moveAhead:50];
-            [self turnRobotRight:RAND_FROM_TO(15, 30)];
+//            if (firstMovement) {
+                [self moveAhead:50];
+                //[self turnRobotLeft: RAND_FROM_TO(15, 30)];
+                [self moveAhead:50];
+                //[self turnRobotRight:RAND_FROM_TO(15, 30)];
+                //firstMovement = false;
+                _currentRobotState = RobotStateDefault;
+//            }
         }
         
         if (_currentRobotState == RobotStateDefault) {
-            
-            if (firstMovement) {
+
+            //if  (firstMovement == TRUE) {
                 int decideLR = RAND_FROM_TO(1, 2);
                 if (decideLR == 1) {
                 [self turnRobotLeft: RAND_FROM_TO(15, 30)];
                 } else {
                 [self turnRobotRight:RAND_FROM_TO(15, 30)];
                 }
-                firstMovement = FALSE;
-            }
+                //firstMovement = FALSE;
+            //}
             
+            [self moveAhead:RAND_FROM_TO(15, 30)];
+        }
+        if (_currentRobotState == RobotStateRunningAway){
+            
+            [self turnRobotLeft: RAND_FROM_TO(15, 30)];
             [self moveAhead:RAND_FROM_TO(15, 30)];
         }
     }
@@ -82,6 +91,10 @@ typedef NS_ENUM(NSInteger, RobotState) {
 // method is called when other robot is scannned
 - (void)scannedRobot:(Robot *)robot atPosition:(CGPoint)position {
     // if my robot is not shooting then stop all other tasks
+    movementOne = position;
+    
+    
+    
     if (_currentRobotState != RobotStateFiring) {
         [self cancelActiveAction];
     }
@@ -119,6 +132,14 @@ typedef NS_ENUM(NSInteger, RobotState) {
         
         _currentRobotState = previousState;
     }
+}
+
+- (void)_gotHit
+{
+    if (_currentRobotState != RobotStateRunningAway) {
+        [self cancelActiveAction];
+    }
+    _currentRobotState = RobotStateDefault;
 }
 
 
